@@ -1,0 +1,56 @@
+@Library("shared") _
+pipeline{
+    agent{ label "binod"}
+    stages{
+        stage("hello"){
+            steps{
+                script{
+                    hello()
+                }
+            }
+        }
+        stage("Code"){
+            
+             steps{
+                 clone("https://github.com/Tejash-TS/django-notes-app.git","main")
+             } 
+        }
+        stage("Build"){
+              steps{
+                 script{
+                     docker_build("notes-app","latest","tejash727")
+                 } 
+                //  echo "this is building the code"
+                //  sh "docker build -t notes-app:latest ."
+              }
+        }
+        stage("Push To DockerHub"){
+             steps{
+                 
+                 script{
+                     docker_push("notes-app","latest","tejash727")
+                 }
+                 // echo "pushing the image to docker hub"
+                  //withCredentials([
+                    //  usernamePassword(
+                      //    credentialsId:"dockerHubCred",
+                    //      passwordVariable:"dockerHubPass",
+                      //    usernameVariable:"dockerHubUser")]){
+                //  sh "docker login -u ${env.dockerHubUser} -p ${env.dockerHubPass}"     //"-u tejash727 -p myPW"
+                 // sh "docker image tag notes-app:latest ${env.dockerHubUser}/notes-app:latest"
+                  //sh "docker push ${env.dockerHubUser}/notes-app:latest"
+           //  } 
+           }
+        }
+        stage("Deploy"){
+              steps{
+                  script{
+                      docker_compose()
+                  }
+        //      echo "this is deploying the code"
+          //    sh "docker compose up -d"
+
+              }
+        }
+    }
+}
